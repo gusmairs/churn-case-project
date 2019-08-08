@@ -9,13 +9,13 @@ from sklearn.metrics import log_loss
 from sklearn.linear_model import LogisticRegression
 from statsmodels.discrete.discrete_model import Logit
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import (
+    RandomForestClassifier,
+    GradientBoostingClassifier
+)
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
 from lib.data_tools import data_load, feature_peek
 from lib.model_tools import roc_plot
-
-# path = '~/OneDrive/DS_Study/churn-project/data/churn_train.csv'
 
 # %% Load and transform data, create model matrix
 #
@@ -24,19 +24,13 @@ X_df, y_df = data_load(train)
 grp_1 = [
     'rider_score', 'avg_surge', 'weekday_pct'
 ]
-# grp_2 = [
-#     'avg_dist', 'avg_surge', 'surge_pct', 'first_30', 'weekday_pct',
-#     'rider_score', 'driver_score', 'iphone', 'luxury', 'signup',
-#     'city_wint', 'city_asta'
-# ]
-# X_df = X_df[grp_2].copy()
-# X_df['constant'] = 1
 X = X_df.to_numpy()
 y = y_df['churn'].to_numpy()
 n = X_df.shape[0]
 
 # %% Logistic regression with statsmodels
 #
+X_df['intercept'] = 1
 model = Logit(y_df, X_df)
 model = model.fit()
 model.summary()

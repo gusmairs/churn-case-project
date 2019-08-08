@@ -1,16 +1,14 @@
 import pandas as pd
 from os import path
 
+data_path = '~/OneDrive/DS_Study/churn-project/data'
+
 def data_load(data_set):
     '''
     Action: Load, clean and transform raw data
       Take: Path to dataset
     Return: Clean dataframe 'df' and series 'target'
     '''
-
-    data_path = '~/OneDrive/DS_Study/churn-project/data'
-
-    # Load data
     dat = pd.read_csv(
         path.join(data_path, data_set),
         parse_dates=['last_trip_date', 'signup_date']
@@ -22,9 +20,7 @@ def data_load(data_set):
         'weekday_pct'
     ]].copy()
 
-    # df.columns = ['avg_dist', 'avg_surge', 'pct_surge', 'first_30',
-    #               'weekday_pct']
-    target = pd.DataFrame()
+    # target = pd.DataFrame()
 
     # Fill NaNs in avg_rating_by_driver
     mean_by = dat['avg_rating_by_driver'].mean()
