@@ -1,22 +1,29 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+from os import path
 
-def data_load(filepath):
+def data_load(data_set):
     '''
     Action: Load, clean and transform raw data
       Take: Path to dataset
     Return: Clean dataframe 'df' and series 'target'
     '''
 
+    data_path = '~/OneDrive/DS_Study/churn-project/data'
+
     # Load data
-    dat = pd.read_csv(filepath, parse_dates=['last_trip_date', 'signup_date'])
+    dat = pd.read_csv(
+        path.join(data_path, data_set),
+        parse_dates=['last_trip_date', 'signup_date']
+    )
 
     # Grab features needing no transform
-    df = dat[['avg_dist', 'avg_surge', 'surge_pct', 'trips_in_first_30_days',
-             'weekday_pct']].copy()
-    df.columns = ['avg_dist', 'avg_surge', 'pct_surge', 'first_30',
-                  'weekday_pct']
+    df = dat.loc[:, [
+        'avg_dist', 'avg_surge', 'surge_pct', 'trips_in_first_30_days',
+        'weekday_pct'
+    ]].copy()
+
+    # df.columns = ['avg_dist', 'avg_surge', 'pct_surge', 'first_30',
+    #               'weekday_pct']
     target = pd.DataFrame()
 
     # Fill NaNs in avg_rating_by_driver
@@ -67,29 +74,3 @@ def feature_peek(df, column_list):
             print('Sample: ' + str(list(cn.sample(5))))
         if c != column_list[-1]:
             print()
-
-def roc_plot(proba, y):
-    '''
-    Action: Build fpr and tpr arrays and plot the ROC
-        In: The probability array and target labels from a fit model
-       Out: The fpr, tpr arrays and the set of threshholds used
-    '''
-    n = y.shape[0]
-    s = min(n, 1000)
-    idx = np.random.randint(n, size=s)
-    ps, ys = proba[idx], y[idx]
-    thresh = np.argsort(ps)
-    fpr, tpr = [], []
-    for t in thresh:
-        predict = np.array(ps > ps[t]).astype(int)
-        fpr.append(np.sum(predict * (1 - ys)) / np.sum(1 - ys))
-        tpr.append(np.sum(predict * ys) / np.sum(ys))
-
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.plot(fpr, tpr)
-    ax.plot([0, 1], [0, 1], c='gray', linewidth=0.6)
-    ax.set(xlabel='False Positive Rate (1 - Specificity)',
-           ylabel='True Positive Rate (Sensitivity, Recall)',
-           title='ROC Plot')
-
-    return fpr, tpr, ps[thresh]

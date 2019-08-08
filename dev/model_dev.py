@@ -1,4 +1,7 @@
-import pandas as pd
+# Model development code for churn case project
+
+# %% Load packages
+#
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -9,22 +12,29 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
+from lib.data_tools import data_load, feature_peek
+from lib.model_tools import roc_plot
 
-from g_churn_functions import data_load, feature_peek, roc_plot
+# path = '~/OneDrive/DS_Study/churn-project/data/churn_train.csv'
 
-path = 'data/churn_train.csv'
-X_df, y_df = data_load(path)
-grp_1 = ['rider_score', 'avg_surge', 'weekday_pct']
-grp_2 = ['avg_dist', 'avg_surge', 'pct_surge', 'first_30', 'weekday_pct',
-         'rider_score', 'driver_score', 'iphone', 'luxury', 'signup',
-         'city_wint', 'city_asta']
-X_df = X_df[grp_2].copy()
-X_df['constant'] = 1
+# %% Load and transform data, create model matrix
+#
+train = 'churn_train.csv'
+X_df, y_df = data_load(train)
+grp_1 = [
+    'rider_score', 'avg_surge', 'weekday_pct'
+]
+# grp_2 = [
+#     'avg_dist', 'avg_surge', 'surge_pct', 'first_30', 'weekday_pct',
+#     'rider_score', 'driver_score', 'iphone', 'luxury', 'signup',
+#     'city_wint', 'city_asta'
+# ]
+# X_df = X_df[grp_2].copy()
+# X_df['constant'] = 1
 X = X_df.to_numpy()
 y = y_df['churn'].to_numpy()
 n = X_df.shape[0]
 
-#
 # %% Logistic regression with statsmodels
 #
 model = Logit(y_df, X_df)
@@ -36,9 +46,9 @@ sum(y_hat == y) / n
 idx = np.random.randint(n, size=1000)
 fpr, tpr, thresholds = roc_plot(proba, y)
 log_loss(y, proba)
-# %%
-#
+
 # %% Logistic regression with sklearn
+#
 log_mod = LogisticRegression(solver='lbfgs', max_iter=1000).fit(X, y)
 log_mod.coef_, log_mod.intercept_
 proba = log_mod.predict_proba(X)[:, 1]
